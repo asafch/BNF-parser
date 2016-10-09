@@ -1,6 +1,6 @@
 # A parser for BNF grammars
 
-The parser is actually a usage of parser combinators written in F#.
+The parser is actually a usage of [parser combinators](https://github.com/asafch/PCfs) written in F#.
 The input should be a file that defines a BNF grammar of some sort. The grammar should conform to [this](https://en.wikipedia.org/wiki/Backus%E2%80%93Naur_Form#Further_examples) grammar.
 
 ## License
