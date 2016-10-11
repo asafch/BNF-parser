@@ -6,11 +6,9 @@ open Pc
 open System
 open System.IO
 
-let inputFile = "bnf.bnf"
+let inputFile = "example.bnf"
 
-let parseFile input =
-  let ParsedFile = File.ReadAllText(input)
-  ParsedFile
+let parseFile input = File.ReadAllText(input)
 
 //printfn "%A" (System.Environment.GetCommandLineArgs().[2])
 let inputContent = parseFile inputFile
@@ -19,7 +17,7 @@ let digit = digitChar
 
 let letter = anyOf (['a'..'z']@['A'..'Z']) <?> "letter"
 
-let symbol = anyOf ['-' ; '!' ; '#' ; '$' ; '%' ; '&' ; '(' ; ')' ; '*' ; '+' ; ',' ; '-' ; '.' ; '/' ; ':' ; ';' ; '<' ; '=' ; '>' ; '?' ; '@' ; '[' ; '\\' ; ']' ; '^' ; '_' ; '`' ; '{' ; ';' ; '}' ; '~'] <?> "symbol"
+let symbol = anyOf [' '; '-' ; '!' ; '#' ; '$' ; '%' ; '&' ; '(' ; ')' ; '*' ; '+' ; ',' ; '-' ; '.' ; '/' ; ':' ; ';' ; '<' ; '=' ; '>' ; '?' ; '@' ; '[' ; '\\' ; ']' ; '^' ; '_' ; '`' ; '{' ; ';' ; '}' ; '~'] <?> "symbol"
 
 let character = letter <|> digit <|> symbol <?> "character"
 
@@ -47,4 +45,23 @@ let opt_whitespace = many space
 
 let term = literal <|> (between (pchar '<') rule_name (pchar '>') ) <?> "term"
 
-let list = many1 (term .>> opt_whitespace) <?> "list"
+// I use many1 instead of the recursion in <list>
+let list = many1 (term .>> opt_whitespace)
+          <?> "list"
+
+let line_end = many1 (opt_whitespace .>>. pchar '\n')
+                <?> "line_end"
+
+// I use many1 instead of the recursion in <expression>
+// In the right-hand side of <!> I wrap the list in a list for type safety
+let expression = ((many1 (list .>> opt_whitespace .>> pchar '|' .>> opt_whitespace) .>>. list) |>> (fun (listOfLists, lst) -> listOfLists @ [lst]))
+                  <|> (list |>> fun res -> [res])
+                  <?> "expression"
+
+
+let rule = opt_whitespace >>. pchar '<' >>. rule_name .>> pchar '>' .>> opt_whitespace .>>
+           pstring "::="
+           .>> opt_whitespace .>>. expression .>> line_end
+           <?> "rule"
+
+let syntax = many1 rule <?> "syntax"
