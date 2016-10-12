@@ -78,5 +78,9 @@ let parseBNF inputFile =
     let inputContent = parseFile inputFile
     let result = run syntax inputContent
     match result with
-    | Success (syntax, input) -> syntax
+    | Success (syntax, input) ->
+          if consumedAllInput result then
+            syntax
+          else
+            raise (ParseFailureException (sprintf "Not all rules parsed, error at line %i" ((parserPositionFromInputState input).line)))
     | Failure (label, error, pos) -> raise (ParseFailureException error)

@@ -8,7 +8,9 @@ The input should be a file that defines a BNF grammar of some sort. The grammar 
 1. Verify correctness of referencing a rule, i.e. can't reference a rule before its definition
 2. Transform parsed grammar into a parser for the grammar's language
 3. Consider support for EBNF - this may ease the transformation of recursive rules to use many/many1
-4. Enhance failure propagation - if the parser failed to match some rule, then the whole grammar is invalid
+
+# Notes
+1. the `.bnf` file should end with a `newline`, as stated in the grammar of BNF grammars (the `<rule>` rule).
 
 ## License
 
